@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajakan Date Khusus Buat Kamu ❤️</title>
+    
+    <!-- Library Confetti (Kertas Berterbangan) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Library html2canvas (Untuk Screenshot) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    
+    <!-- Library Flatpickr (Untuk Kalender Selalu Terbuka) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&family=Pacifico&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        html, body {
+            height: auto;
+            min-height: 100%;
+        }
+
+        body {
+            background-color: #ffdde1;
+            background-image: linear-gradient(315deg, #ffdde1 0%, #ee9ca7 74%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            width: 100%;
+            max-width: 420px;
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative; 
+            min-height: 350px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab.active {
+            display: block;
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            color: #ff4d6d;
+            margin-bottom: 20px;
+            font-size: 26px;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        /* --- STYLING TOMBOL AWAL --- */
+        .btn-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            height: 80px; 
+            margin-top: 20px;
+        }
+
+        .btn {
+            background-color: #ff4d6d;
+            color: white;
+            border: 2px solid #ff4d6d;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+            z-index: 2;
+        }
+
+        .btn:hover {
+            background-color: #c9184a;
+            border-color: #c9184a;
+            transform: scale(1.05);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: rgba(85, 85, 85, 0.45);
+            border: 1px dashed rgba(85, 85, 85, 0.35);
+            padding: 8px 16px;
+            font-size: 12.5px;
+            font-weight: 600;
+            border-radius: 999px;
+            box-shadow: none;
+            z-index: 1; 
+        }
+
+        .btn-outline:hover {
+            background-color: transparent;
+            transform: none;
+        }
+
+        /* --- STYLING INPUT & KALENDER --- */
+        .input-group {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #ff4d6d;
+            font-weight: 600;
+        }
+
+        #dateInput {
+            border: none !important;  
+            background: transparent;    
+            outline: none;      
+            text-align: center;     
+            font-size: 16px;
+            color: #ff4d6d;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            display: none; /* Disembunyikan karena sudah ada inline calendar */
+        }
+
+        .flatpickr-calendar {
+            margin: 0 auto !important;
+            box-shadow: none !important;
+            border: 2px solid #ffdde1 !important;
+            border-radius: 15px !important;
+            padding: 10px;
+        }
+
+        /* Pilihan Jam (Desain Baru) */
+        .time-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .tab-jam {
+            background-color: #ffffff;
+            border: 2px solid #e3dbd1; 
+            border-radius: 20px;       
+            padding: 12px 10px;        
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-jam.selected {
+            background-color: #fff0f3;
+            border-color: #ff4d6d;
+            transform: scale(1.05);
+        }
+
+        .waktu {
+            color: #271414; 
+            font-size: 20px;
+            font-weight: 800; 
+            line-height: 1;
+            margin-bottom: 6px; 
+            pointer-events: none;
+        }
+
+        .keterangan {
+            color: #8c8282; 
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1;
+            letter-spacing: 0.5px;
+            pointer-events: none;
+        }
+
+        /* Pilihan Makanan */
+        .food-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .food-option {
+            border: 2px solid #ffdde1;
+            border-radius: 15px;
+            padding: 15px 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .food-option.selected {
+            background: #fff0f3;
+            border-color: #ff4d6d;
+            transform: scale(1.05);
+        }
+
+        .food-emoji { font-size: 40px; margin-bottom: 5px; }
+        .food-name { font-weight: 600; color: #555; font-size: 13px; }
+
+        /* Tiket Hasil Akhir */
+        #ticketCard {
+            background: #FBF3E4;
+            border: 2px dashed #ff4d6d;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .summary-item {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e3dbd1;
+            padding-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .summary-item span {
+            font-weight: bold;
+            color: #ff4d6d;
+            font-size: 16px;
+        }
+
+        .btn-secondary {
+            background-color: #25D366; 
+            border-color: #25D366;
+            width: 100%;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #1ebe57;
+            border-color: #1ebe57;
+        }
+
+        .btn-download {
+            background-color: #0077b6;
+            border-color: #0077b6;
+            width: 100%;
+        }
+        .btn-download:hover {
+            background-color: #023e8a;
+            border-color: #023e8a;
+        }
+
+        #shareHint {
+            font-size: 12px;
+            color: #ff4d6d;
+            margin-bottom: 10px;
+            min-height: 18px;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainContainer">
+        
+        <!-- TAB 1: AJAKAN -->
+        <div id="tab1" class="tab active">
+            <h1>Halo Sayang! ❤️</h1>
+            <p>Aku mau nanya sesuatu nih sama kamu... Kamu mau nggak pergi nge-date sama aku minggu ini?</p>
+            
+            <div class="btn-container" id="btn-wrap">
+                <button class="btn" onclick="nextTab('tab1', 'tab2')">Mau banget! 😍</button>
+                <div id="bayangan-tombol" style="width: 125px; height: 45px; display: none;"></div>
+                <button class="btn btn-outline" id="btn-tidak">Nggak ah 😔</button>
+            </div>
+        </div>
+
+        <!-- TAB 2: PILIH TANGGAL & WAKTU -->
+        <div id="tab2" class="tab">
+            <h1>Yay! Asik! 🎉</h1>
+            <p>Pilih tanggalnya di bawah ini ya, lalu pilih jamnya!</p>
+            
+            <div class="input-group">
+                <input type="text" id="dateInput">
+            </div>
+
+            <div class="input-group">
+                <label>Pilih Jam:</label>
+                <div class="time-grid">
+                    <div class="tab-jam time-option" onclick="selectTime(this, '09.00 PAGI')">
+                        <div class="waktu">09.00</div>
+                        <div class="keterangan">PAGI</div>
+                    </div>
+                    <div class="tab-jam time-option" onclick="selectTime(this, '13.00 SIANG')">
+                        <div class="waktu">13.00</div>
+                        <div class="keterangan">SIANG</div>
+                    </div>
+                    <div class="tab-jam time-option" onclick="selectTime(this, '16.00 SORE')">
+                        <div class="waktu">16.00</div>
+                        <div class="keterangan">SORE</div>
+                    </div>
+                    <div class="tab-jam time-option" onclick="selectTime(this, '19.00 MALAM')">
+                        <div class="waktu">19.00</div>
+                        <div class="keterangan">MALAM</div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn" style="width: 100%; margin: 10px 0 0 0;" onclick="saveDateTime()">Simpan Tanggal 📅</button>
+        </div>
+
+        <!-- TAB 3: PILIH MAKANAN -->
+        <div id="tab3" class="tab">
+            <h1>Mau Makan Apa? 😋</h1>
+            <p>Pilih makanan yang lagi pengen banget kamu makan nanti!</p>
+            
+            <div class="food-grid">
+                <div class="food-option" onclick="selectFood(this, 'Sushi', '🍣')">
+                    <div class="food-emoji">🍣</div>
+                    <div class="food-name">Sushi</div>
+                </div>
+                <div class="food-option" onclick="selectFood(this, 'Steak', '🥩')">
+                    <div class="food-emoji">🥩</div>
+                    <div class="food-name">Steak</div>
+                </div>
+                <div class="food-option" onclick="selectFood(this, 'Pizza', '🍕')">
+                    <div class="food-emoji">🍕</div>
+                    <div class="food-name">Pizza</div>
+                </div>
+                <div class="food-option" onclick="selectFood(this, 'Dessert / Cafe', '🍦')">
+                    <div class="food-emoji">🍦</div>
+                    <div class="food-name">Dessert / Cafe</div>
+                </div>
+            </div>
+            <button class="btn" style="width: 100%; margin: 0;" onclick="saveFood()">Lanjut 👉</button>
+        </div>
+
+        <!-- TAB 4: HASIL (TIKET DATE) -->
+        <div id="tab4" class="tab">
+            <h1>Tiket Date Kita! 💌</h1>
+            <p>Yeay! Ini ringkasan rencana date kita. Simpan atau kirim ya!</p>
+            
+            <!-- Area yang akan di-screenshot -->
+            <div id="ticketCard">
+                <h2 style="text-align: center; color: #ff4d6d; font-family: 'Pacifico', cursive; margin-bottom: 5px;">Date Ticket ❤️</h2>
+                <div style="text-align: center; font-size: 11px; font-weight: 800; color: #8c8282; margin-bottom: 15px; letter-spacing: 1px;" id="ticketNo">-</div>
+                
+                <div class="summary-item">Tanggal: <br><span id="ticketDate">-</span></div>
+                <div class="summary-item">Jam: <br><span id="ticketTime">-</span></div>
+                <div class="summary-item">Menu Makanan: <br><span id="ticketFood">-</span></div>
+                <p style="text-align: center; font-size: 13px; margin-top: 15px; margin-bottom: 0; color: #ff4d6d; font-family: 'Pacifico', cursive;">I can't wait to see you! 😘</p>
+            </div>
+
+            <p id="shareHint"></p>
+
+            <button class="btn btn-download" id="btnDownload">⬇️ Simpan & Unduh Gambar</button>
+            <br><br>
+            <button class="btn btn-secondary" id="btnShareWA">💬 Kirim Langsung ke WA</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Data penyimpanan
+        let data = {
+            date: '', // Format asli YYYY-MM-DD
+            dateFormatted: '', // Format panjang untuk ditampillkan
+            timeLabel: '',
+            food: '',
+            foodEmoji: ''
+        };
+
+        // DOM Elements untuk Tiket
+        var ticketDateEl = document.getElementById('ticketDate');
+        var ticketTimeEl = document.getElementById('ticketTime');
+        var ticketFoodEl = document.getElementById('ticketFood');
+        var ticketNoEl = document.getElementById('ticketNo');
+        var ticketCard = document.getElementById('ticketCard');
+        var shareHint = document.getElementById('shareHint');
+        var rendered = false;
+
+        // ====== Inisialisasi Kalender (Flatpickr) ======
+        flatpickr("#dateInput", {
+            inline: true, 
+            minDate: "today", 
+            locale: "id", 
+            onChange: function(selectedDates, dateStr, instance) {
+                data.date = dateStr; 
+                // Format untuk tampilan tiket
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                data.dateFormatted = selectedDates[0].toLocaleDateString('id-ID', options);
+            }
+        });
+
+        function nextTab(currentTabId, nextTabId) {
+            document.getElementById(currentTabId).classList.remove('active');
+            document.getElementById(nextTabId).classList.add('active');
+        }
+
+        // ====== LOGIKA TOMBOL "TIDAK" (LARI) ======
+        const btnTidak = document.getElementById('btn-tidak');
+        const container = document.getElementById('mainContainer');
+
+        var dodgeMessages = [
+            "Yakin nih?",
+            "Coba klik yang satu lagi deh 👀",
+            "Eh, jangan gitu...",
+            "Pikir-pikir lagi ya?",
+            "Aku nunggu kok 🥺",
+            "Serius nolak?",
+            "Sst, klik yang satu lagi..."
+        ];
+
+        function kabur() {
+            if (btnTidak.style.position !== 'absolute') {
+                btnTidak.style.position = 'absolute';
+                document.getElementById('bayangan-tombol').style.display = 'block';
+            }
+
+            const randomIndex = Math.floor(Math.random() * dodgeMessages.length);
+            btnTidak.innerText = dodgeMessages[randomIndex];
+
+            const containerRect = container.getBoundingClientRect();
+            const btnRect = btnTidak.getBoundingClientRect();
+
+            const maxX = containerRect.width - btnRect.width - 40; 
+            const maxY = containerRect.height - btnRect.height - 40;
+
+            const randomX = Math.floor(Math.random() * maxX) + 20;
+            const randomY = Math.floor(Math.random() * maxY) + 20;
+
+            btnTidak.style.left = `${randomX}px`;
+            btnTidak.style.top = `${randomY}px`;
+        }
+
+        btnTidak.addEventListener('mouseover', kabur);
+        btnTidak.addEventListener('touchstart', (e) => {
+            e.preventDefault(); 
+            kabur();
+        });
+
+        // ====== LOGIKA TAB 2: WAKTU ======
+        function selectTime(element, timeValue) {
+            let options = document.querySelectorAll('.time-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            data.timeLabel = timeValue;
+        }
+
+        function saveDateTime() {
+            if(!data.date || !data.timeLabel) {
+                alert("Pilih tanggal di kalender dan jamnya dulu ya sayang!");
+                return;
+            }
+            nextTab('tab2', 'tab3');
+        }
+
+        // ====== LOGIKA TAB 3: MAKANAN ======
+        function selectFood(element, foodValue, emoji) {
+            let options = document.querySelectorAll('.food-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            data.food = foodValue;
+            data.foodEmoji = emoji;
+        }
+
+        function saveFood() {
+            if(!data.food) {
+                alert("Pilih mau makan apa dulu dong!");
+                return;
+            }
+            
+            renderTicket();
+            nextTab('tab3', 'tab4');
+            triggerConfetti();
+        }
+
+        // ====== EFEK KERTAS BERTERBANGAN (CONFETTI) ======
+        function triggerConfetti() {
+            var duration = 3 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff4d6d', '#ffdde1', '#fff'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff4d6d', '#ffdde1', '#fff'] });
+
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+
+        // ====== RENDER TIKET & SHARE ======
+        function renderTicket(){
+            if(!data.date) return;
+            ticketDateEl.textContent = data.dateFormatted;
+            ticketTimeEl.textContent = data.timeLabel || '-';
+            ticketFoodEl.textContent = (data.foodEmoji || '') + ' ' + (data.food || '-');
+            
+            if(!rendered){
+                var codeDate = data.date.replace(/-/g, '');
+                var rand = Math.floor(Math.random() * 90 + 10);
+                ticketNoEl.textContent = 'NO. LOVE-' + codeDate + '-' + rand;
+                rendered = true;
+            }
+        }
+
+        function downloadCanvasAsImage(canvas, filename){
+            var link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.getElementById('btnDownload').addEventListener('click', function(){
+            if(typeof html2canvas === 'undefined'){
+                shareHint.textContent = 'Gagal memuat alat gambar. Coba periksa koneksi internet lalu muat ulang halaman.';
+                return;
+            }
+            shareHint.textContent = 'Menyiapkan gambar tiket...';
+            html2canvas(ticketCard, { backgroundColor:'#FBF3E4', scale:2 }).then(function(canvas){
+                downloadCanvasAsImage(canvas, 'tiket-kencan.png');
+                shareHint.textContent = 'Tiket berhasil diunduh sebagai gambar 💾';
+            });
+        });
+
+        document.getElementById('btnShareWA').addEventListener('click', function(){
+            if(typeof html2canvas === 'undefined'){
+                shareHint.textContent = 'Gagal memuat alat gambar. Coba periksa koneksi internet lalu muat ulang halaman.';
+                return;
+            }
+            shareHint.textContent = 'Menyiapkan tiket untuk dibagikan...';
+            var text = 'Aku pilih tanggal ' + ticketDateEl.textContent + ', jam ' + ticketTimeEl.textContent + ', dan mau ' + ticketFoodEl.textContent + '! Yuk kencan 💕';
+
+            html2canvas(ticketCard, { backgroundColor:'#FBF3E4', scale:2 }).then(function(canvas){
+                canvas.toBlob(function(blob){
+                    var file = new File([blob], 'tiket-kencan.png', { type: 'image/png' });
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({ files: [file], title: 'Tiket Kencan', text: text }).then(function(){
+                            shareHint.textContent = 'Tiket berhasil dibagikan 💌';
+                        }).catch(function(err){
+                            if (err && err.name === 'AbortError') return;
+                            fallbackShare(canvas, text);
+                        });
+                    } else {
+                        fallbackShare(canvas, text);
+                    }
+                }, 'image/png');
+            });
+        });
+
+        function fallbackShare(canvas, text){
+            // Nomor WA tujuan (kode negara tanpa +)
+            var targetNumber = '621234567890';
+
+            downloadCanvasAsImage(canvas, 'tiket-kencan.png');
+            
+            var waUrl = 'https://wa.me/' + targetNumber + '?text=' + encodeURIComponent(text + '\n\n(Gambar tiket sudah otomatis ke-download, tinggal lampirkan di chat ya!)');
+            window.open(waUrl, '_blank');
+            
+            shareHint.textContent = 'Gambar tiket sudah diunduh — tinggal lampirkan manual di chat WhatsApp ya 💌';
+        }
+    </script>
+</body>
+</html>

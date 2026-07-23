@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>when yhh</title>
+    <!-- Library untuk efek kertas berterbangan (Confetti) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Library untuk mengubah HTML menjadi Gambar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Pacifico&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #ffdde1;
+            background-image: linear-gradient(315deg, #ffdde1 0%, #ee9ca7 74%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden; /* Mencegah scroll saat tombol 'Tidak' kabur */
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            width: 100%;
+            max-width: 400px;
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+        }
+
+        .tab {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab.active {
+            display: block;
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            color: #ff4d6d;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .btn {
+            background-color: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background-color: #c9184a;
+            transform: scale(1.05);
+        }
+
+        /* Tombol 'Tidak' spesial */
+        #btn-tidak {
+            background-color: #ccc;
+            font-size: 12px;
+            padding: 8px 15px;
+            position: absolute;
+            transition: 0.2s; /* Untuk efek kabur */
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ff4d6d;
+            font-weight: 600;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ffdde1;
+            border-radius: 10px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        /* Pilihan Jam (Radio Button style) */
+        .time-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .time-option {
+            padding: 10px;
+            border: 2px solid #ffdde1;
+            border-radius: 10px;
+            background: white;
+            color: #555;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .time-option.selected {
+            background: #ff4d6d;
+            color: white;
+            border-color: #ff4d6d;
+        }
+
+        /* Pilihan Makanan */
+        .food-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .food-option {
+            border: 2px solid #ffdde1;
+            border-radius: 15px;
+            padding: 15px 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .food-option.selected {
+            background: #fff0f3;
+            border-color: #ff4d6d;
+            transform: scale(1.05);
+        }
+
+        .food-emoji {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+
+        .food-name {
+            font-weight: 600;
+            color: #555;
+            font-size: 13px;
+        }
+
+        /* Tiket Hasil Akhir */
+        #summaryCard {
+            background: #fff;
+            border: 2px dashed #ff4d6d;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .summary-item {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .summary-item span {
+            font-weight: bold;
+            color: #ff4d6d;
+        }
+
+        .btn-secondary {
+            background-color: #25D366; /* Warna WA */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #1ebe57;
+        }
+
+        .btn-download {
+            background-color: #0077b6;
+            width: 100%;
+        }
+        .btn-download:hover {
+            background-color: #023e8a;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainContainer">
+        
+        <!-- TAB 1: AJAKAN -->
+        <div id="tab1" class="tab active">
+            <h1>Halo Sayang! ❤️</h1>
+            <p>Aku mau nanya sesuatu nih sama kamu... Kamu mau nggak pergi nge-date sama aku minggu ini?</p>
+            <div style="position: relative; height: 100px; display: flex; justify-content: center; align-items: center; gap: 20px;">
+                <button class="btn" onclick="nextTab('tab1', 'tab2')">Mau banget! 😍</button>
+                <button id="btn-tidak">Nggak ah</button>
+            </div>
+        </div>
+
+        <!-- TAB 2: PILIH TANGGAL & WAKTU -->
+        <div id="tab2" class="tab">
+            <h1>Yay! Asik! 🎉</h1>
+            <p>Kapan nih kamu bisanya? Pilih tanggal dan jamnya ya!</p>
+            
+            <div class="input-group">
+                <label>Pilih Tanggal:</label>
+                <input type="date" id="dateInput">
+            </div>
+
+            <div class="input-group">
+                <label>Pilih Jam:</label>
+                <div class="time-grid">
+                    <div class="time-option" onclick="selectTime(this, 'Pagi (10:00)')">Pagi (10:00)</div>
+                    <div class="time-option" onclick="selectTime(this, 'Siang (13:00)')">Siang (13:00)</div>
+                    <div class="time-option" onclick="selectTime(this, 'Sore (16:00)')">Sore (16:00)</div>
+                    <div class="time-option" onclick="selectTime(this, 'Malam (19:00)')">Malam (19:00)</div>
+                </div>
+            </div>
+            <button class="btn" style="width: 100%; margin: 20px 0 0 0;" onclick="saveDateTime()">Simpan Tanggal 📅</button>
+        </div>
+
+        <!-- TAB 3: PILIH MAKANAN -->
+        <div id="tab3" class="tab">
+            <h1>Mau Makan Apa? 😋</h1>
+            <p>Pilih makanan yang lagi pengen banget kamu makan nanti!</p>
+            
+            <div class="food-grid">
+                <div class="food-option" onclick="selectFood(this, 'Sushi')">
+                    <div class="food-emoji">🍣</div>
+                    <div class="food-name">Sushi</div>
+                </div>
+                <div class="food-option" onclick="selectFood(this, 'Steak')">
+                    <div class="food-emoji">🥩</div>
+                    <div class="food-name">Steak</div>
+                </div>
+                <div class="food-option" onclick="selectFood(this, 'Pizza')">
+                    <div class="food-emoji">🍕</div>
+                    <div class="food-name">Pizza</div>
+                </div>
+                <div class="food-option" onclick="selectFood(this, 'Dessert / Cafe')">
+                    <div class="food-emoji">🍦</div>
+                    <div class="food-name">Dessert / Cafe</div>
+                </div>
+            </div>
+            <button class="btn" style="width: 100%; margin: 0;" onclick="saveFood()">Lanjut 👉</button>
+        </div>
+
+        <!-- TAB 4: HASIL (TIKET DATE) -->
+        <div id="tab4" class="tab">
+            <h1>Tiket Date Kita! 💌</h1>
+            <p>Yeay! Ini ringkasan rencana date kita. Simpan atau kirim ya!</p>
+            
+            <!-- Area ini yang akan di-screenshot -->
+            <div id="summaryCard">
+                <h2 style="text-align: center; color: #ff4d6d; font-family: 'Pacifico', cursive; margin-bottom: 15px;">Date Ticket ❤️</h2>
+                <div class="summary-item">Tanggal: <br><span id="resDate">-</span></div>
+                <div class="summary-item">Jam: <br><span id="resTime">-</span></div>
+                <div class="summary-item">Menu Makanan: <br><span id="resFood">-</span></div>
+                <p style="text-align: center; font-size: 12px; margin-top: 15px; color: #ff4d6d;">I can't wait to see you! 😘</p>
+            </div>
+
+            <button class="btn btn-download" onclick="downloadImage()">⬇️ Simpan & Unduh Gambar</button>
+            <p style="font-size: 11px; margin-top: 5px; color:#555;">(Unduh gambar dulu, lalu kirim manual ke WA)</p>
+            
+            <hr style="margin: 15px 0; border: 0.5px solid #ffdde1;">
+            
+            <button class="btn btn-secondary" onclick="sendToWhatsApp()">💬 Kirim Teks Langsung ke WA</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Objek untuk menyimpan data
+        let dateData = {
+            date: '',
+            time: '',
+            food: ''
+        };
+
+        // Fungsi berpindah tab
+        function nextTab(currentTabId, nextTabId) {
+            document.getElementById(currentTabId).classList.remove('active');
+            document.getElementById(nextTabId).classList.add('active');
+        }
+
+        // ====== LOGIKA TOMBOL "TIDAK" ======
+        const btnTidak = document.getElementById('btn-tidak');
+        const container = document.getElementById('mainContainer');
+
+        // Fungsi membuat tombol kabur
+        function kabur() {
+            // Mendapatkan dimensi container agar tombol tidak keluar batas
+            const containerRect = container.getBoundingClientRect();
+            const btnRect = btnTidak.getBoundingClientRect();
+
+            // Batas maksimal pergerakan x dan y
+            const maxX = containerRect.width - btnRect.width - 20; 
+            const maxY = containerRect.height - btnRect.height - 20;
+
+            const randomX = Math.floor(Math.random() * maxX) - (maxX / 2) + 20;
+            const randomY = Math.floor(Math.random() * maxY) - (maxY / 2);
+
+            btnTidak.style.transform = `translate(${randomX}px, ${randomY}px)`;
+        }
+
+        // Memanggil fungsi kabur saat cursor masuk (untuk PC) atau disentuh (untuk HP)
+        btnTidak.addEventListener('mouseover', kabur);
+        btnTidak.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Mencegah klik di hp
+            kabur();
+        });
+
+
+        // ====== LOGIKA TAB 2: WAKTU ======
+        function selectTime(element, timeValue) {
+            // Hapus class 'selected' dari semua pilihan jam
+            let options = document.querySelectorAll('.time-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Tambahkan class 'selected' ke elemen yg diklik
+            element.classList.add('selected');
+            dateData.time = timeValue;
+        }
+
+        function saveDateTime() {
+            const dateInput = document.getElementById('dateInput').value;
+            if(!dateInput || !dateData.time) {
+                alert("Pilih tanggal dan jamnya dulu ya sayang!");
+                return;
+            }
+            
+            // Format tanggal agar lebih cantik (Opsional)
+            const dateObj = new Date(dateInput);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateData.date = dateObj.toLocaleDateString('id-ID', options);
+            
+            nextTab('tab2', 'tab3');
+        }
+
+
+        // ====== LOGIKA TAB 3: MAKANAN ======
+        function selectFood(element, foodValue) {
+            // Hapus class 'selected' dari semua pilihan makanan
+            let options = document.querySelectorAll('.food-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Tambahkan class 'selected' ke elemen yg diklik
+            element.classList.add('selected');
+            dateData.food = foodValue;
+        }
+
+        function saveFood() {
+            if(!dateData.food) {
+                alert("Pilih mau makan apa dulu dong!");
+                return;
+            }
+            
+            // Set teks di tab 4
+            document.getElementById('resDate').innerText = dateData.date;
+            document.getElementById('resTime').innerText = dateData.time;
+            document.getElementById('resFood').innerText = dateData.food;
+            
+            nextTab('tab3', 'tab4');
+            triggerConfetti();
+        }
+
+        // ====== EFEK KERTAS BERTERBANGAN (CONFETTI) ======
+        function triggerConfetti() {
+            var duration = 3 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ff4d6d', '#ffdde1', '#fff']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ff4d6d', '#ffdde1', '#fff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        // ====== FITUR UNDUH GAMBAR (HTML2CANVAS) ======
+        function downloadImage() {
+            const card = document.getElementById('summaryCard');
+            
+            // Gunakan html2canvas untuk mengambil snapshot elemen
+            html2canvas(card, { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+                // Konversi kanvas menjadi Data URL (gambar)
+                let imageURL = canvas.toDataURL("image/png");
+                
+                // Buat elemen link bohongan untuk memicu download
+                let link = document.createElement('a');
+                link.href = imageURL;
+                link.download = "Tiket-Date-Kita.png";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                alert("Gambarnya udah ke-download! Sekarang kamu bisa kirim fotonya ke aku lewat WA ya. ❤️");
+            });
+        }
+
+        // ====== FITUR KIRIM TEKS KE WA ======
+        function sendToWhatsApp() {
+            // Nomor WA tujuan (Bisa diganti atau dibiarkan kosong agar user milih kontak sendiri)
+            // Format harus diawali kode negara tanpa '+', contoh: 628123456789
+            const phoneNumber = ""; 
+            
+            const message = `Halo sayang! Aku udah isi tiket date kita nih 😍\n\n*Tanggal:* ${dateData.date}\n*Jam:* ${dateData.time}\n*Makan:* ${dateData.food}\n\nCan't wait to see you! ❤️`;
+            const encodedMessage = encodeURIComponent(message);
+            
+            const waURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
+            window.open(waURL, '_blank');
+        }
+
+    </script>
+</body>
+</html>
