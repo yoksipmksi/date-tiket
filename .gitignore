@@ -1,0 +1,26 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
+
+# Dependencies (jika suatu saat pakai npm)
+node_modules/
+
+# Build
+dist/
+build/
+
+index1.html
+index2.html
+index3.html
+index4.html
